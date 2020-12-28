@@ -1,5 +1,4 @@
 /**
- *
  * @author binglang
  */
 package main
@@ -13,9 +12,11 @@ import (
 )
 
 var p pusher
+var users []*User
 
 func init()  {
 	p = new(dingBot)
+	users, _ = SelectUserList()
 }
 
 func main() {
@@ -131,15 +132,19 @@ func randomJoke() (string, error) {
 }
 
 func randomUser() (*User, error) {
-	users, err := SelectUserList()
-	if err != nil {
-		log.Println("randomUser err: e=", err)
-		return nil, err
-	}
 	if len(users) == 0 {
-		return nil, nil
+		users, err = SelectUserList()
+		if err != nil {
+			log.Println("randomUser err: e=", err)
+			return nil, err
+		}
 	}
 	randNum := rand.Intn(len(users))
 	user := users[randNum]
+	if len(users) > 1 {
+		users = append(users[:randNum], users[randNum+1:]...)
+	} else {
+		users, _ = SelectUserList()
+	}
 	return user, nil
 }
